@@ -1,0 +1,10 @@
+.container {
+    height: 100%;
+    transition: width 5s linear;
+    width: 0;
+    background-color: white;
+}
+
+.animContainer {
+    width: 100%;
+}

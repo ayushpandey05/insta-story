@@ -1,118 +1,166 @@
 import Image from "next/image";
 import { Inter } from "next/font/google";
+import { GetServerSideProps } from "next";
+import { Avatar } from "@/components/Avatar";
+import { Stories } from "@/types/stories";
+import { FC, useCallback, useMemo, useState } from "react";
+import { Container } from "@/components/Container";
+import { StoryPreview } from "@/components/StoryPreview";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
+interface Props {
+  stories: Stories;
+}
+
+const Home: FC<Props> = ({ stories }) => {
+  const [state, setState] = useState({ visibleStoryIndex: -1, imageIndex: -1 });
+
+  const showStory = useCallback((storyIndex: number) => {
+    setState((prevState) => ({
+      ...prevState,
+      visibleStoryIndex: storyIndex,
+      imageIndex: -1,
+    }));
+  }, []);
+  const hideStory = useCallback(() => {
+    setState((prevState) => ({ ...prevState, visibleStoryIndex: -1 }));
+  }, []);
+
+  const showPreviousStory = useCallback(() => {
+    let prevStoryIndex = 0;
+    let prevImageIndex = -1;
+    if (state.visibleStoryIndex > 0) {
+      prevStoryIndex = state.visibleStoryIndex - 1;
+      prevImageIndex = stories[prevStoryIndex].stories.length - 1;
+    }
+    setState((prevState) => ({
+      ...prevState,
+      visibleStoryIndex: prevStoryIndex,
+      imageIndex: prevImageIndex,
+    }));
+  }, [state.visibleStoryIndex, stories]);
+
+  const showNextStory = useCallback(() => {
+    let nextStoryIndex = -1;
+    if (state.visibleStoryIndex < stories.length - 1) {
+      nextStoryIndex = state.visibleStoryIndex + 1;
+    }
+    setState((prevState) => ({
+      ...prevState,
+      visibleStoryIndex: nextStoryIndex,
+      imageIndex: -1,
+    }));
+  }, [stories.length, state.visibleStoryIndex]);
+
+  const storyToShow = useMemo(() => {
+    if (state.visibleStoryIndex > -1) {
+      return stories[state.visibleStoryIndex];
+    }
+  }, [state.visibleStoryIndex, stories]);
+
   return (
     <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
+      className={inter.className}
+      style={{
+        width: "100%",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
+        backgroundColor: "white",
+      }}
     >
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">pages/index.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+      <p
+        style={{
+          color: "black",
+          fontSize: 24,
+          fontStyle: "italic",
+          fontWeight: 600,
+          padding: 8,
+        }}
+      >
+        Instagram
+      </p>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: 20,
+          position: "relative",
+          overflowX: "auto",
+          padding: 8,
+        }}
+      >
+        {stories?.map((story, storyIndex) => {
+          const openStory = () => {
+            showStory(storyIndex);
+          };
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+          return (
+            <Container
+              onClick={openStory}
+              style={{ alignItems: "center", gap: 8 }}
+            >
+              <Avatar imgUrl={story.userPicture} />
+              <p style={{ color: "black" }}>{story.userName}</p>
+            </Container>
+          );
+        })}
+      </div>
+      {storyToShow ? (
+        <StoryPreview
+          key={`story-${state.visibleStoryIndex}`}
+          name={`story-${state.visibleStoryIndex}`}
+          story={storyToShow}
+          showPreviousStory={showPreviousStory}
+          showNextStory={showNextStory}
+          prevImageIndex={state.imageIndex}
+          hideStory={hideStory}
         />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      ) : (
+        <></>
+      )}
     </main>
   );
-}
+};
+
+export default Home;
+
+export const getServerSideProps: GetServerSideProps<Props> = async (
+  context
+) => {
+  const { req } = context;
+
+  const protocol = req.headers["x-forwarded-proto"] || "http";
+  const host = req.headers["host"];
+  const baseUrl = `${protocol}://${host}`;
+
+  try {
+    // Construct the full URL to your API route
+    const apiUrl = `${baseUrl}/api/stories`;
+    const res = await fetch(apiUrl);
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch");
+    }
+
+    const stories: Stories = await res.json();
+
+    console.log("@@@>>>data!>>>>>>", stories);
+
+    return {
+      props: {
+        stories,
+      },
+    };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      props: {
+        stories: [],
+      },
+    };
+  }
+};
