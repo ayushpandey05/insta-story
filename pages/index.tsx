@@ -128,17 +128,13 @@ const Home: FC<Props> = ({ stories }) => {
 
 export default Home;
 
-export const getServerSideProps: GetServerSideProps<Props> = async (
-  context
-) => {
-  const { req } = context;
-
-  const protocol = req.headers["x-forwarded-proto"] || "http";
-  const host = req.headers["host"];
-  const baseUrl = `${protocol}://${host}`;
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+  const baseUrl =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3000"
+      : "https://insta-story-fawn.vercel.app/";
 
   try {
-    // Construct the full URL to your API route
     const apiUrl = `${baseUrl}/api/stories`;
     const res = await fetch(apiUrl);
 
@@ -148,15 +144,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
 
     const stories: Stories = await res.json();
 
-    console.log("@@@>>>data!>>>>>>", stories);
-
     return {
       props: {
         stories,
       },
     };
   } catch (error) {
-    console.error(error);
+    // console.error(error);
 
     return {
       props: {
