@@ -136,9 +136,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
     const apiUrl = `${baseUrl}/api/stories`;
     const res = await fetch(apiUrl);
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch");
-    }
+    // if (!res.ok) {
+    //   throw new Error("Failed to fetch");
+    // }
 
     const stories: Stories = await res.json();
 
