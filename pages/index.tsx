@@ -6,6 +6,7 @@ import { Stories } from "@/types/stories";
 import { FC, useCallback, useMemo, useState } from "react";
 import { Container } from "@/components/Container";
 import { StoryPreview } from "@/components/StoryPreview";
+import axios from "axios";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -134,13 +135,17 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
 
   try {
     const apiUrl = `${baseUrl}/api/stories`;
-    const res = await fetch(apiUrl);
+
+    const response = await axios.get(apiUrl);
+    const stories: Stories = response.data;
+
+    // const res = await fetch(apiUrl);
 
     // if (!res.ok) {
     //   throw new Error("Failed to fetch");
     // }
 
-    const stories: Stories = await res.json();
+    // const stories: Stories = await res.json();
 
     return {
       props: {
