@@ -132,7 +132,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const baseUrl =
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://insta-story-fawn.vercel.app/";
+      : "https://insta-story-fawn.vercel.app";
 
   try {
     const apiUrl = `${baseUrl}/api/stories`;
