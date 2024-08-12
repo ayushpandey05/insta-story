@@ -6,7 +6,6 @@ import { Stories } from "@/types/stories";
 import { FC, useCallback, useMemo, useState } from "react";
 import { Container } from "@/components/Container";
 import { StoryPreview } from "@/components/StoryPreview";
-import axios from "axios";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -129,23 +128,27 @@ const Home: FC<Props> = ({ stories }) => {
 
 export default Home;
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  // const baseUrl = "http://localhost:3000" // use for development
-  const baseUrl = "https://admirable-brioche-22e9c9.netlify.app";
+export const getServerSideProps: GetServerSideProps<Props> = async (
+  context
+) => {
+  const { req } = context;
+
+  const protocol = req.headers["x-forwarded-proto"] || "http";
+  const host = req.headers["host"];
+  const baseUrl = `${protocol}://${host}`;
 
   try {
+    // Construct the full URL to your API route
     const apiUrl = `${baseUrl}/api/stories`;
+    const res = await fetch(apiUrl);
 
-    const response = await axios.get(apiUrl);
-    const stories: Stories = response.data;
+    if (!res.ok) {
+      throw new Error("Failed to fetch");
+    }
 
-    // const res = await fetch(apiUrl);
+    const stories: Stories = await res.json();
 
-    // if (!res.ok) {
-    //   throw new Error("Failed to fetch");
-    // }
-
-    // const stories: Stories = await res.json();
+    console.log("@@@>>>data!>>>>>>", stories);
 
     return {
       props: {
