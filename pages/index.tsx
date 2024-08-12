@@ -131,7 +131,7 @@ export default Home;
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   // const baseUrl = "http://localhost:3000" // use for development
-  const baseUrl = "https://insta-story-fawn.vercel.app";
+  const baseUrl = "https://admirable-brioche-22e9c9.netlify.app";
 
   try {
     const apiUrl = `${baseUrl}/api/stories`;
