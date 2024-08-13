@@ -100,6 +100,7 @@ const Home: FC<Props> = ({ stories }) => {
           return (
             <Container
               key={`story-avatar-${storyIndex}`}
+              data-testid={`story-avatar-${storyIndex}`}
               onClick={openStory}
               style={{ alignItems: "center", gap: 8 }}
             >

@@ -160,8 +160,8 @@ const StoryPreview: FC<StoryPreviewProps> = ({
           </Container>
         </Container>
         <Container style={{ flexDirection: "row", flex: 1 }}>
-          <Container style={{ flex: 1 }} onClick={showPrevImage} />
-          <Container style={{ flex: 1 }} onClick={showNextImage} />
+          <Container data-testid='show-prev-preview' style={{ flex: 1 }} onClick={showPrevImage} />
+          <Container data-testid='show-next-preview' style={{ flex: 1 }} onClick={showNextImage} />
         </Container>
       </Container>
     </Container>
